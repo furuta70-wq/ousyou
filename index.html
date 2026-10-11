@@ -576,6 +576,34 @@ body.play-lock{overflow:hidden;overscroll-behavior:none}
 #quiz .quiz-hud .icon-btn{width:44px;height:44px;min-width:44px;min-height:44px}
 @media (max-height:640px){#quiz .quiz-hud .icon-btn{width:44px;height:44px;min-width:44px;min-height:44px}}
 
+
+/* --- robust wrapping for kitchen test text --- */
+#quiz .call-card{min-width:0;max-width:100%;overflow:hidden}
+#quiz .call-text{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  white-space:normal;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  line-break:anywhere;
+  text-wrap:pretty;
+}
+#quiz .answer{min-width:0;max-width:100%}
+#quiz .answer-text{
+  min-width:0;
+  max-width:100%;
+  white-space:normal;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  line-break:anywhere;
+}
+@media (max-width:480px){
+  #quiz .call-card{padding-left:12px;padding-right:12px}
+  #quiz .call-text{letter-spacing:-.025em}
+  #quiz .answer-text{-webkit-line-clamp:3}
+}
+
 </style>
 </head>
 <body>
@@ -1077,7 +1105,15 @@ function renderQuestion(silentSound=false){
   const item=quizList[quizIndex];
   document.getElementById('quizCount').textContent=`${quizIndex+1} / ${quizList.length}`;
   document.getElementById('quizProgress').style.width=`${((quizIndex+1)/quizList.length)*100}%`;
-  document.getElementById('callText').textContent=item.call;
+  const callText=document.getElementById('callText');
+  callText.replaceChildren();
+  item.call.split('、').forEach((part,i,parts)=>{
+    callText.append(document.createTextNode(part));
+    if(i<parts.length-1){
+      callText.append(document.createTextNode('、'));
+      callText.append(document.createElement('wbr'));
+    }
+  });
   const callCard=document.getElementById('callCard');
   const callLen=[...item.call].length;
   callCard.classList.remove('resolved-good','resolved-bad','pop','shake','call-medium','call-long');
